@@ -8,6 +8,7 @@
 #-----import statements-----
 import turtle as trtl
 import random as rand
+import leaderboard as lb
 
 #-----game configuration-----
 # To view in trinket change the values of font_size, spot_size, and 
@@ -21,7 +22,11 @@ timer = 30
 counter_interval = 1000 
 timer_up = False
 score = 0
-
+# leaderboard variables
+leaderboard_file_name = "a122_leaderboard.txt"
+leader_names_list = []
+leader_scores_list = []
+player_name = input ("Please enter your name:")
 #-----initialize the turtles-----
 spot = trtl.Turtle() 
 spot.shape(spot_shape)
@@ -43,6 +48,24 @@ counter.pendown()
 #counter.showturtle()
 
 #-----game functions-----
+# manages the leaderboard for top 5 scorers
+def manage_leaderboard():
+  
+  global leader_scores_list
+  global leader_names_list
+  global score
+  global spot
+
+  # load all the leaderboard records into the lists
+  lb.load_leaderboard(leaderboard_file_name, leader_names_list, leader_scores_list)
+
+  # TODO
+  if (len(leader_scores_list) < 5 or score > leader_scores_list[4]):
+    lb.update_leaderboard(leaderboard_file_name, leader_names_list, leader_scores_list, player_name, score)
+    lb.draw_leaderboard(leader_names_list, leader_scores_list, True, spot, score)
+
+  else:
+    lb.draw_leaderboard(leader_names_list, leader_scores_list, False, spot, score)
 
 # countdown function
 def countdown():
@@ -55,6 +78,12 @@ def countdown():
     counter.write("Timer: " + str(timer), font=font_setup)
     timer -= 1
     counter.getscreen().ontimer(countdown, counter_interval) 
+    if timer <= 0:
+      counter.write("Time's Up", font=font_setup)
+      timer_up = True
+      manage_leaderboard()
+      else:
+  
 
 # update and display the score
 def update_score():
